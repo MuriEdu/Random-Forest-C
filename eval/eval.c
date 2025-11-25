@@ -33,7 +33,6 @@ void hyperparameter_search(double **data, struct dim *csv_dim)
     // with the same parameters.
     size_t max_features = 3;
     size_t min_samples_leaf = 2;
-    size_t max_depth = 7;
 
     // Number of folds for cross validation.
     size_t k_folds = 5;
@@ -128,7 +127,7 @@ double eval_model(const DecisionTreeNode **random_forest,
 double cross_validate(double **data,
                       const RandomForestParameters *params,
                       const struct dim *csv_dim,
-                      const int k_folds)
+                      const size_t k_folds)
 {
     double sumAccuracy = 0;
     size_t rows = csv_dim->rows;

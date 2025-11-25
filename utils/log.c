@@ -16,4 +16,4 @@ void log_if_level(int level, const char *format, ...) {
         vprintf(format, args);
         va_end(args);
     }
-}   
+}

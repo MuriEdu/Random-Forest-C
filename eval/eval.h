@@ -30,6 +30,6 @@ forest model for each iteration and evaluates on a separate test fold.
 double cross_validate(double **data,
                       const RandomForestParameters *params,
                       const struct dim *csv_dim,
-                      const int k_folds);
+                      const size_t k_folds);
 
 #endif // eval_h

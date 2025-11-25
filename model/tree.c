@@ -167,7 +167,7 @@ double calculate_gini_index(DecisionTreeData *data_split,
     log_if_level(1, "calculating gini index based on split...\n");
 
     // DecisionTreeData data split should consist of two halves.
-    int count = 2;
+    size_t count = 2;
     size_t n_instances = data_split[0].length + data_split[1].length;
     double gini = 0.0;
     for (size_t i = 0; i < count; ++i)
@@ -289,7 +289,7 @@ void grow(DecisionTreeNode *decision_tree,
           size_t max_depth,
           size_t min_samples_leaf,
           size_t max_features,
-          int depth,
+          size_t depth,
           size_t rows,
           size_t cols,
           long *nodeId,

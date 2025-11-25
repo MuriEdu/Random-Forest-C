@@ -11,7 +11,7 @@
 
 int log_level = 1;
 
-int get_log_level()
+int get_log_level(void)
 {
     return log_level;
 }
@@ -36,7 +36,7 @@ int contains_int(int *arr, size_t n, int val)
     return 0;
 }
 
-int is_row_part_of_testing_fold(int row, const ModelContext *ctx)
+int is_row_part_of_testing_fold(size_t row, const ModelContext *ctx)
 {
     size_t lower_bound = ctx->testingFoldIdx * ctx->rowsPerFold;
     size_t upper_bound = lower_bound + ctx->rowsPerFold;

@@ -45,7 +45,7 @@ double **combine_arrays(double **first, double **second, size_t n1, size_t n2, s
 Given a row number and a model context returns whether or not the particular
 row belongs to a fold that is designated as the evaluation / testing fold.
 */
-int is_row_part_of_testing_fold(int row, const ModelContext *ctx);
+int is_row_part_of_testing_fold(size_t row, const ModelContext *ctx);
 
 /*
 Sets the 'log_level' to the 'selected_log_level'.
@@ -55,7 +55,7 @@ void set_log_level(int selected_log_level);
 /*
 Returns whatever the current 'log_level' is.
 */
-int get_log_level();
+int get_log_level(void);
 
 /*
 Allocates memory for a two-dimensional like array of size 'rows' * 'cols'.

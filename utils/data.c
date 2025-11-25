@@ -22,7 +22,7 @@ int DEBUG = 0;
 
 
 // Returns the buffer size for reading lines
-int get_buf_size()
+int get_buf_size(void)
 {
     return 8192;
     // return BUFSIZ;
@@ -116,8 +116,8 @@ void parse_csv(const char *file_name, double **data_p, const struct dim csv_dim)
     int buf_size;
     char *buffer;
     char *token;
-    int row = 0;
-    int idx = 0;
+    size_t row = 0;
+    size_t idx = 0;
 
     csv_file = fopen(file_name, "r");
     if (csv_file == NULL) {
@@ -140,7 +140,7 @@ void parse_csv(const char *file_name, double **data_p, const struct dim csv_dim)
 
         token = strtok(buffer, delimiter);
         while (token != NULL) {
-            DEBUG_PRINT("Parsing row %d col %zu: %s\n", row, (idx % csv_dim.cols) + 1, token);
+            DEBUG_PRINT("Parsing row %zu col %zu: %s\n", row, (idx % csv_dim.cols) + 1, token);
             (*data_p)[idx] = atof(token);
             ++idx;
             token = strtok(NULL, delimiter);

@@ -3,6 +3,7 @@
 */
 
 #include "forest.h"
+#include "../utils/log.h"
 
 const DecisionTreeNode *train_model_tree(double **data,
                                          const RandomForestParameters *params,
