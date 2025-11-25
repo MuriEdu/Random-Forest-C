@@ -2,7 +2,7 @@ import csv
 import random
 import pandas as pd
 
-NUM_ROWS = 5000
+NUM_ROWS = 500
 NUM_COLS = 100
 
 rows_written = 0
