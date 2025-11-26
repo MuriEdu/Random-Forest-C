@@ -251,7 +251,6 @@ DecisionTreeDataSplit calculate_best_data_split(double **data,
     // because this function is called from within the main parallel loop
     // in train_model. This can lead to an oversubscription of threads and
     // may decrease performance. It requires careful tuning.
-    #pragma omp parallel for
     for (size_t i = 0; i < max_features; ++i)
     {
         int feature_index = features[i];
@@ -270,7 +269,6 @@ DecisionTreeDataSplit calculate_best_data_split(double **data,
             // Multiple threads may try to update the "best" variables simultaneously.
             // This ensures that only one thread can be in this block at a time,
             // which can become a bottleneck.
-            #pragma omp critical
             {
                 if (gini < best_gini)
                 {
@@ -360,6 +358,7 @@ void grow(DecisionTreeNode *decision_tree,
         decision_tree->leftChild = empty_node(nodeId);
         populate_split_data(decision_tree->leftChild, &data_split);
 
+        #pragma omp task
         grow(decision_tree->leftChild,
              max_depth,
              min_samples_leaf,
@@ -370,6 +369,7 @@ void grow(DecisionTreeNode *decision_tree,
              nodeId,
              ctx);
 
+        #pragma omp taskwait
         free(data_split.data);
     }
     if (right_half.length <= min_samples_leaf)
@@ -388,6 +388,7 @@ void grow(DecisionTreeNode *decision_tree,
         decision_tree->rightChild = empty_node(nodeId);
         populate_split_data(decision_tree->rightChild, &data_split);
 
+        #pragma omp task
         grow(decision_tree->rightChild,
              max_depth,
              min_samples_leaf,
@@ -398,6 +399,7 @@ void grow(DecisionTreeNode *decision_tree,
              nodeId,
              ctx);
 
+        #pragma omp taskwait
         free(data_split.data);
     }
 

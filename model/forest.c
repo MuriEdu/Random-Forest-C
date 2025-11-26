@@ -63,15 +63,21 @@ const DecisionTreeNode **train_model(double **data,
 
     // Populate the array with allocated memory for the random forest with pointers to individual decision
     // trees.
-    #pragma omp parallel for
-    for (size_t i = 0; i < params->n_estimators; ++i)
+    #pragma omp parallel
     {
-        //log_if_level(0, "training tree %ld on thread %d\n", i, omp_get_thread_num());
-        srand((unsigned int)time(NULL) + omp_get_thread_num());
-        // Node ID generator. We use this such that every node in the tree gets assigned a strictly
-        // increasing ID for debugging.
-        long nodeId = 0;
-        random_forest[i] = train_model_tree(data, params, csv_dim, &nodeId, ctx);
+        #pragma omp single
+        {
+            for (size_t i = 0; i < params->n_estimators; ++i)
+            {
+                #pragma omp task firstprivate(i)
+                {
+                    srand((unsigned int)time(NULL) ^ omp_get_thread_num());
+                    long nodeId = 0;
+                    random_forest[i] = train_model_tree(data, params, csv_dim, &nodeId, ctx);
+                }
+            }
+            #pragma omp taskwait
+        }
     }
     return random_forest;
 }
