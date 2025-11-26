@@ -7,6 +7,7 @@
 
 #include "tree.h"
 #include "../utils/log.h"
+#include <omp.h>
 
 /*
 Allocates memory for an empty DecisionTreeNode and returns a pointer to the node.
@@ -246,6 +247,11 @@ DecisionTreeDataSplit calculate_best_data_split(double **data,
     if (log_level > 1)
         printf("-----------------------------------------\n");
 
+    // This loop is now parallelized. This creates nested parallelism
+    // because this function is called from within the main parallel loop
+    // in train_model. This can lead to an oversubscription of threads and
+    // may decrease performance. It requires careful tuning.
+    #pragma omp parallel for
     for (size_t i = 0; i < max_features; ++i)
     {
         int feature_index = features[i];
@@ -258,22 +264,31 @@ DecisionTreeDataSplit calculate_best_data_split(double **data,
                                                          cols);
             double gini = calculate_gini_index(data_split, classes.labels, classes.count, cols);
 
-            if (gini < best_gini)
-            {
-                best_index = feature_index;
-                best_value = data[j][feature_index];
-                best_gini = gini;
+            //log_if_level(0, "[calculate_best_data_split] thread %d is calculating gini\n", omp_get_thread_num());
 
-                // First free the memory that was previously allocated for the 'data_split' and pointer
-                // which was assigned to 'best_data_split' since now we have found a new better split.
-                if (best_data_split)
-                    free_decision_tree_data(best_data_split);
-
-                best_data_split = data_split;
-            }
-            else
+            // A critical section is required here to prevent a race condition.
+            // Multiple threads may try to update the "best" variables simultaneously.
+            // This ensures that only one thread can be in this block at a time,
+            // which can become a bottleneck.
+            #pragma omp critical
             {
-                free_decision_tree_data(data_split);
+                if (gini < best_gini)
+                {
+                    best_index = feature_index;
+                    best_value = data[j][feature_index];
+                    best_gini = gini;
+
+                    // Safely swap the old best data split with the new one.
+                    if (best_data_split)
+                        free_decision_tree_data(best_data_split);
+
+                    best_data_split = data_split;
+                }
+                else
+                {
+                    // If this split is not better, free the memory for it.
+                    free_decision_tree_data(data_split);
+                }
             }
         }
     }

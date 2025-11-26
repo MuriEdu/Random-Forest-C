@@ -66,7 +66,7 @@ const DecisionTreeNode **train_model(double **data,
     #pragma omp parallel for
     for (size_t i = 0; i < params->n_estimators; ++i)
     {
-        log_if_level(0, "training tree %ld on thread %d\n", i, omp_get_thread_num());
+        //log_if_level(0, "training tree %ld on thread %d\n", i, omp_get_thread_num());
         srand((unsigned int)time(NULL) + omp_get_thread_num());
         // Node ID generator. We use this such that every node in the tree gets assigned a strictly
         // increasing ID for debugging.
