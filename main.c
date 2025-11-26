@@ -108,7 +108,6 @@ int main(int argc, char **argv)
     // Record and output the time taken to run.
     clock_t end_clock = clock();
     printf("(time taken: %fs)\n", (double)(end_clock - begin_clock) / CLOCKS_PER_SEC);
-
     // Free loaded csv file data.
     free(data);
     free(pivoted_data);

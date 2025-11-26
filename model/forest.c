@@ -2,6 +2,7 @@
 @author andrii dobroshynski
 */
 
+#include "time.h"
 #include "forest.h"
 #include "../utils/log.h"
 
@@ -47,6 +48,8 @@ const DecisionTreeNode *train_model_tree(double **data,
     return root;
 }
 
+#include <omp.h>
+
 const DecisionTreeNode **train_model(double **data,
                                      const RandomForestParameters *params,
                                      const struct dim *csv_dim,
@@ -56,14 +59,18 @@ const DecisionTreeNode **train_model(double **data,
     const DecisionTreeNode **random_forest = (const DecisionTreeNode **)
         malloc(sizeof(DecisionTreeNode *) * params->n_estimators);
 
-    // Node ID generator. We use this such that every node in the tree gets assigned a strictly
-    // increasing ID for debugging.
-    long nodeId = 0;
+
 
     // Populate the array with allocated memory for the random forest with pointers to individual decision
     // trees.
+    #pragma omp parallel for
     for (size_t i = 0; i < params->n_estimators; ++i)
     {
+        log_if_level(0, "training tree %ld on thread %d\n", i, omp_get_thread_num());
+        srand((unsigned int)time(NULL) + omp_get_thread_num());
+        // Node ID generator. We use this such that every node in the tree gets assigned a strictly
+        // increasing ID for debugging.
+        long nodeId = 0;
         random_forest[i] = train_model_tree(data, params, csv_dim, &nodeId, ctx);
     }
     return random_forest;
